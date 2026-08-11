@@ -22,9 +22,7 @@ def widget_chat(payload: WidgetChatRequest):
             message=payload.message
         )
 
-        return {
-            "response": response
-        }
+        return response
 
     except Exception as e:
 
