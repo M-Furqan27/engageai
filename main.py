@@ -6,8 +6,8 @@ from database.database import Base, engine
 from database.models import (
     Organization,
     Representative,
-    # Service,
-    Agent
+    Agent,
+    Lead
 )
 
 # Register conversation models

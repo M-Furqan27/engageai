@@ -16,6 +16,8 @@ from database.database import Base
 
 from sqlalchemy.dialects.postgresql import UUID
 
+from sqlalchemy import ForeignKey
+
 import uuid
 
 
