@@ -201,13 +201,11 @@ class Agent(Base):
 
     __tablename__ = "agents"
 
-
     id = Column(
         UUID(as_uuid=True),
         primary_key=True,
         default=uuid.uuid4
     )
-
 
     organization_id = Column(
         UUID(as_uuid=True),
@@ -215,28 +213,43 @@ class Agent(Base):
             "organizations.organization_id",
             ondelete="CASCADE"
         ),
-        nullable=False
+        nullable=False,
+        unique=True
     )
 
+    # Azure AI Foundry details
 
     azure_agent_name = Column(
-        String(255)
+        String(255),
+        nullable=True
     )
-
 
     azure_agent_version = Column(
-        String(100)
+        String(100),
+        nullable=True
     )
-
 
     system_prompt = Column(
-        Text
+        Text,
+        nullable=True
     )
 
+    # Public chat/widget URL
+
+    agent_link = Column(
+        String(500),
+        nullable=True
+    )
 
     created_at = Column(
         TIMESTAMP,
         default=datetime.utcnow
+    )
+
+
+    organization = relationship(
+        "Organization",
+        back_populates="agent"
     )
 
 

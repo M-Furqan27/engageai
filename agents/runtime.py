@@ -352,3 +352,322 @@ class AgentRuntime:
         finally:
 
             db.close()
+            
+            
+            
+    def chat_from_widget(
+            self,
+            organization_id,
+            agent_id,
+            visitor_id,
+            message,
+            lead_id=None,
+        ):
+    
+            db = get_session()
+    
+            try:
+    
+                conversation_record = start_or_get_conversation(
+                    db=db,
+                    organization_id=organization_id,
+                    agent_id=agent_id,
+                    lead_id=lead_id,
+                    visitor_id=visitor_id,
+                )
+    
+    
+                agent_record = (
+                    self.agent_service
+                    .get_agent(
+                        db,
+                        organization_id
+                    )
+                )
+    
+    
+                if not agent_record:
+                    raise Exception(
+                        "Agent not found. Create agent first."
+                    )
+    
+    
+                print(
+                    "AZURE AGENT:",
+                    agent_record.azure_agent_name,
+                    agent_record.azure_agent_version
+                )
+    
+    
+                add_user_message(
+                    db=db,
+                    conversation_id=conversation_record.id,
+                    message_text=message,
+                    metadata=None,
+                )
+    
+    
+                history = get_conversation_history(
+                    db=db,
+                    conversation_id=conversation_record.id
+                )
+    
+    
+                messages = []
+    
+                for msg in history:
+    
+                    messages.append(
+                        {
+                            "role": msg.sender_type,
+                            "content": msg.message_text
+                        }
+                    )
+    
+    
+                with DefaultAzureCredential() as credential:
+    
+                    with AIProjectClient(
+                        endpoint=self.project_endpoint,
+                        credential=credential
+                    ) as project_client:
+    
+    
+                        with project_client.get_openai_client() as openai_client:
+    
+    
+                            response = (
+                                openai_client
+                                .responses
+                                .create(
+    
+                                    extra_body={
+                                        "agent_reference":{
+    
+                                            "name":
+                                            agent_record.azure_agent_name,
+    
+                                            "type":
+                                            "agent_reference",
+    
+                                            "version":
+                                            agent_record.azure_agent_version
+                                        }
+                                    },
+    
+                                    input=messages
+                                )
+                            )
+    
+    
+                            print("FIRST AZURE RESPONSE")
+                            print(response.output)
+    
+    
+    
+                            input_list = []
+    
+    
+                            for item in response.output:
+    
+    
+                                if item.type != "function_call":
+                                    continue
+    
+    
+                                print(
+                                    "TOOL CALLED:",
+                                    item.name
+                                )
+    
+    
+                                arguments = json.loads(
+                                    item.arguments
+                                )
+    
+    
+    
+                                # -----------------------------
+                                # Knowledge Search
+                                # -----------------------------
+    
+                                if item.name == "knowledge_search":
+    
+    
+                                    result = (
+                                        self.knowledge_service
+                                        .search_knowledge(
+                                            organization_id,
+                                            arguments["query"]
+                                        )
+                                    )
+    
+    
+                                    input_list.append(
+                                        FunctionCallOutput(
+                                            type="function_call_output",
+                                            call_id=item.call_id,
+                                            output=json.dumps(result)
+                                        )
+                                    )
+    
+    
+    
+                                # -----------------------------
+                                # Available Slots
+                                # -----------------------------
+    
+                                elif item.name == "get_available_slots":
+    
+    
+                                    result = get_available_slots(
+    
+                                        organization_id,
+    
+                                        visitor_id,
+    
+                                        arguments.get("name"),
+    
+                                        arguments.get("email"),
+    
+                                        arguments.get("message")
+    
+                                    )
+    
+    
+                                    input_list.append(
+                                        FunctionCallOutput(
+                                            type="function_call_output",
+                                            call_id=item.call_id,
+                                            output=json.dumps(result)
+                                        )
+                                    )
+    
+    
+    
+                                # -----------------------------
+                                # Create Calendar Event
+                                # -----------------------------
+    
+                                elif item.name == "create_calendar_event":
+    
+    
+                                    result = create_calendar_event(
+    
+                                        visitor_id,
+    
+                                        arguments.get("name"),
+    
+                                        arguments.get("email"),
+    
+                                        arguments.get("slot_start"),
+    
+                                        arguments.get("slot_end")
+    
+                                    )
+    
+    
+                                    input_list.append(
+                                        FunctionCallOutput(
+                                            type="function_call_output",
+                                            call_id=item.call_id,
+                                            output=json.dumps(result)
+                                        )
+                                    )
+    
+    
+    
+    
+                            # -----------------------------
+                            # Send Tool Response Back
+                            # -----------------------------
+    
+                            if input_list:
+    
+    
+                                print(
+                                    "SENDING TOOL RESULTS"
+                                )
+    
+    
+                                response = (
+                                    openai_client
+                                    .responses
+                                    .create(
+    
+                                        previous_response_id=response.id,
+    
+                                        input=input_list,
+    
+                                        extra_body={
+    
+                                            "agent_reference":{
+    
+                                                "name":
+                                                agent_record.azure_agent_name,
+    
+                                                "type":
+                                                "agent_reference",
+    
+                                                "version":
+                                                agent_record.azure_agent_version
+    
+                                            }
+    
+                                        }
+                                    )
+                                )
+    
+    
+    
+                            print(
+                                "FINAL RESPONSE:",
+                                response.output_text
+                            )
+    
+    
+    
+                            if response.output_text:
+    
+    
+                                add_assistant_message(
+    
+                                    db=db,
+    
+                                    conversation_id=
+                                    conversation_record.id,
+    
+                                    message_text=
+                                    response.output_text,
+    
+                                    metadata=None,
+    
+                                )
+    
+    
+                                return {
+    
+                                    "conversation_id":
+                                    str(conversation_record.id),
+    
+                                    "response":
+                                    response.output_text
+    
+                                }
+    
+    
+    
+                            return {
+    
+                                "conversation_id":
+                                str(conversation_record.id),
+    
+                                "response":
+                                None
+    
+                            }
+    
+    
+            finally:
+    
+                db.close()

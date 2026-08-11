@@ -13,6 +13,8 @@ from database.models import (
 from pipeline.router import router as pipeline_router
 
 from fastapi.middleware.cors import CORSMiddleware
+from widget.router import router as widget_router
+
 
 
 Base.metadata.create_all(bind=engine)
@@ -36,6 +38,8 @@ app.add_middleware(
 app.include_router(
     pipeline_router
 )
+
+app.include_router(widget_router)
 
 
 @app.get("/")

@@ -13,6 +13,10 @@ class AgentService:
         prompt
     ):
 
+        agent_link = (
+            f"https://your-portal-domain.com/widget/{organization_id}"
+        )
+
 
         record = Agent(
 
@@ -24,7 +28,9 @@ class AgentService:
                 agent.version
             ),
 
-            system_prompt=prompt
+            system_prompt=prompt,
+
+            agent_link=agent_link
 
         )
 
