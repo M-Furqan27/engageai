@@ -22,7 +22,7 @@ class OrganizationService:
             db.query(Organization)
 
             .filter(
-                Organization.id == organization_id
+                Organization.organization_id == organization_id
             )
 
             .first()
