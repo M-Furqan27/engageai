@@ -1,5 +1,6 @@
 from agents.main_agent import MainAgent
 from knowledge_base.service import KnowledgeBaseService
+from uuid import UUID
 
 
 class PipelineService:
@@ -12,7 +13,7 @@ class PipelineService:
 
     async def setup(
         self,
-        organization_id: int,
+        organization_id: UUID,
         text: str | None = None,
         urls: list[str] = [],
         pdfs: list = []

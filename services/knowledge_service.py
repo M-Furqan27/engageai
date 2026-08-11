@@ -1,5 +1,5 @@
 from knowledge_base.service import KnowledgeBaseService
-
+from uuid import UUID
 
 class KnowledgeService:
 
@@ -12,7 +12,7 @@ class KnowledgeService:
 
     def search_knowledge(
         self,
-        organization_id: int,
+        organization_id: UUID,
         query: str
     ):
 

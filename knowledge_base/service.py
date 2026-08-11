@@ -3,6 +3,7 @@
 # vector database added
 
 from typing import List
+from uuid import UUID
 
 from fastapi import UploadFile
 
@@ -34,7 +35,7 @@ class KnowledgeBaseService:
 
     async def create(
         self,
-        organization_id: int,
+        organization_id: UUID,
         text: str | None,
         urls: List[str],
         pdfs: List[UploadFile],
@@ -86,7 +87,7 @@ class KnowledgeBaseService:
 
     def search(
         self,
-        organization_id: int,
+        organization_id: UUID,
         query: str
     ):
 

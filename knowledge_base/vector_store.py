@@ -11,8 +11,7 @@ from knowledge_base.schemas import KnowledgeBase
 from azure.search.documents import SearchClient
 from azure.core.credentials import AzureKeyCredential
 from azure.search.documents.models import VectorizedQuery
-import uuid
-
+from uuid import UUID
 
 class VectorStore:
 
@@ -90,7 +89,7 @@ class VectorStore:
 
     def search(
         self,
-        organization_id: int,
+        organization_id: UUID,
         query_embedding: list,
         top_k: int = 5
     ):

@@ -1,4 +1,5 @@
 from collections import defaultdict
+from uuid import UUID
 
 from knowledge_base.schemas import (
     EmbeddedChunk,
@@ -11,7 +12,7 @@ class KnowledgeBuilder:
 
     def build(
         self,
-        organization_id: int,
+        organization_id: UUID,
         embedded_chunks: list[EmbeddedChunk],
     ) -> KnowledgeBase:
 

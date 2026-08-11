@@ -3,6 +3,7 @@
 # new
 
 from typing import List, Optional
+from uuid import UUID
 
 from pydantic import BaseModel
 
@@ -38,7 +39,7 @@ class KnowledgeSource(BaseModel):
 
 
 class KnowledgeBase(BaseModel):
-    organization_id: int
+    organization_id: UUID
     sources: List[KnowledgeSource]
 
 

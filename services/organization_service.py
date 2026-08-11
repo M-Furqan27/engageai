@@ -1,4 +1,6 @@
 from sqlalchemy.orm import Session
+from uuid import UUID
+
 
 
 from database.models import (
@@ -13,7 +15,7 @@ class OrganizationService:
     def get_agent_context(
         self,
         db: Session,
-        organization_id: int
+        organization_id: UUID
     ):
 
 

@@ -2,6 +2,8 @@
 
 from typing import List
 
+from uuid import UUID
+
 from fastapi import APIRouter, File, Form, UploadFile
 
 from knowledge_base.service import KnowledgeBaseService
@@ -16,7 +18,7 @@ service = KnowledgeBaseService()
 
 @router.post("/create")
 async def create_knowledge_base(
-    organization_id: int = Form(...),
+    organization_id: UUID = Form(...),
     text: str = Form(""),
     url: str = Form(""),
     pdfs: List[UploadFile] = File(...),
