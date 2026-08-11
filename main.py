@@ -6,7 +6,7 @@ from database.database import Base, engine
 from database.models import (
     Organization,
     Representative,
-    Service,
+    # Service,
     Agent
 )
 

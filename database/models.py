@@ -3,48 +3,45 @@ from sqlalchemy import (
     Integer,
     String,
     Text,
-    ForeignKey,
-    TIMESTAMP
+    TIMESTAMP,
+    Boolean,
+    DateTime,
 )
 
 from sqlalchemy.orm import relationship
 
 from datetime import datetime
 
-
 from database.database import Base
 
-from conversations.models import Conversation, ConversationMessage
+from sqlalchemy.dialects.postgresql import UUID
 
+import uuid
 
 
 class Organization(Base):
 
     __tablename__ = "organizations"
 
-
     id = Column(
-        Integer,
-        primary_key=True
+        UUID(as_uuid=True),
+        primary_key=True,
+        default=uuid.uuid4
     )
-
 
     name = Column(
         String(255),
         nullable=False
     )
 
-
     description = Column(
         Text
     )
-
 
     created_at = Column(
         TIMESTAMP,
         default=datetime.utcnow
     )
-
 
 
     representatives = relationship(
@@ -54,44 +51,77 @@ class Organization(Base):
 
 
 
-
-
 class Representative(Base):
 
     __tablename__ = "representatives"
 
 
-    id = Column(
-        Integer,
-        primary_key=True
+    representative_id = Column(
+        UUID(as_uuid=True),
+        primary_key=True,
+        default=uuid.uuid4
     )
 
 
     organization_id = Column(
-        Integer,
-        ForeignKey(
-            "organizations.id"
-        )
+        UUID(as_uuid=True),
+        nullable=False
     )
 
 
-    name = Column(
+    representative_name = Column(
+        String(150),
+        nullable=False
+    )
+
+
+    service = Column(
+        String(150),
+        nullable=False
+    )
+
+
+    service_description = Column(
+        Text,
+        nullable=False
+    )
+
+
+    company_email = Column(
         String(255),
         nullable=False
     )
 
 
-    email = Column(
-        String(255),
-        unique=True
+    invitation_status = Column(
+        String(30),
+        default="Pending"
+    )
+
+
+    calendar_connected = Column(
+        Boolean,
+        default=False
+    )
+
+
+    status = Column(
+        String(30),
+        default="Active"
     )
 
 
     created_at = Column(
-        TIMESTAMP,
+        DateTime(timezone=True),
         default=datetime.utcnow
     )
 
+
+    updated_at = Column(
+        DateTime(timezone=True),
+        default=datetime.utcnow,
+        onupdate=datetime.utcnow
+    )
 
 
     organization = relationship(
@@ -100,72 +130,22 @@ class Representative(Base):
     )
 
 
-    services = relationship(
-        "Service",
-        back_populates="representative"
-    )
 
-
-
-
-
-class Service(Base):
-
-    __tablename__ = "services"
-
-
-    id = Column(
-        Integer,
-        primary_key=True
-    )
-
-
-    representative_id = Column(
-        Integer,
-        ForeignKey(
-            "representatives.id"
-        )
-    )
-
-
-    name = Column(
-        String(255),
-        nullable=False
-    )
-
-
-    description = Column(
-        Text
-    )
-
-
-
-    created_at = Column(
-        TIMESTAMP,
-        default=datetime.utcnow
-    )
-
-
-
-    representative = relationship(
-        "Representative",
-        back_populates="services"
-    )
-    
 class Agent(Base):
 
     __tablename__ = "agents"
 
 
     id = Column(
-        Integer,
-        primary_key=True
+        UUID(as_uuid=True),
+        primary_key=True,
+        default=uuid.uuid4
     )
 
 
     organization_id = Column(
-        Integer,
-        ForeignKey("organizations.id")
+        UUID(as_uuid=True),
+        nullable=False
     )
 
 
@@ -188,25 +168,23 @@ class Agent(Base):
         TIMESTAMP,
         default=datetime.utcnow
     )
-    
-    
+
+
+
 class Lead(Base):
 
     __tablename__ = "leads"
 
 
     id = Column(
-        Integer,
+        UUID(as_uuid=True),
         primary_key=True,
-        autoincrement=True
+        default=uuid.uuid4
     )
 
 
     organization_id = Column(
-        Integer,
-        ForeignKey(
-            "organizations.id"
-        ),
+        UUID(as_uuid=True),
         nullable=False
     )
 
