@@ -39,8 +39,7 @@ class Conversation(Base):
     organization_id = Column(
         UUID(as_uuid=True),
         ForeignKey(
-            "organizations.id",
-            ondelete="CASCADE"
+            "organizations.organization_id"
         ),
         nullable=False
     )
