@@ -23,24 +23,71 @@ class Organization(Base):
 
     __tablename__ = "organizations"
 
-    id = Column(
+    organization_id = Column(
         UUID(as_uuid=True),
         primary_key=True,
         default=uuid.uuid4
     )
 
-    name = Column(
-        String(255),
+    organization_name = Column(
+        String(150),
         nullable=False
     )
 
+    business_type = Column(
+        String(100),
+        nullable=True
+    )
+
+    website = Column(
+        String(255),
+        nullable=True
+    )
+
+    business_email = Column(
+        String(255),
+        nullable=True
+    )
+
+    business_phone = Column(
+        String(20),
+        nullable=True
+    )
+
+    country = Column(
+        String(100),
+        nullable=True
+    )
+
+    address = Column(
+        Text,
+        nullable=True
+    )
+
     description = Column(
-        Text
+        Text,
+        nullable=True
+    )
+
+    logo_url = Column(
+        String(255),
+        nullable=True
+    )
+
+    onboarding_completed = Column(
+        Boolean,
+        default=False
     )
 
     created_at = Column(
-        TIMESTAMP,
+        DateTime(timezone=True),
         default=datetime.utcnow
+    )
+
+    updated_at = Column(
+        DateTime(timezone=True),
+        default=datetime.utcnow,
+        onupdate=datetime.utcnow
     )
 
 
@@ -48,7 +95,6 @@ class Organization(Base):
         "Representative",
         back_populates="organization"
     )
-
 
 
 class Representative(Base):
