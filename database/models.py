@@ -102,6 +102,13 @@ class Organization(Base):
         back_populates="organization",
         cascade="all, delete-orphan"
     )
+    
+    agent = relationship(
+        "Agent",
+        back_populates="organization",
+        uselist=False,
+        cascade="all, delete-orphan"
+    )
 
 
 
