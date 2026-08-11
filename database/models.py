@@ -1,11 +1,11 @@
 from sqlalchemy import (
     Column,
-    Integer,
     String,
     Text,
     TIMESTAMP,
     Boolean,
     DateTime,
+    ForeignKey,
 )
 
 from sqlalchemy.orm import relationship
@@ -18,6 +18,10 @@ from sqlalchemy.dialects.postgresql import UUID
 
 import uuid
 
+
+# =========================
+# Organization
+# =========================
 
 class Organization(Base):
 
@@ -93,9 +97,15 @@ class Organization(Base):
 
     representatives = relationship(
         "Representative",
-        back_populates="organization"
+        back_populates="organization",
+        cascade="all, delete-orphan"
     )
 
+
+
+# =========================
+# Representative
+# =========================
 
 class Representative(Base):
 
@@ -111,6 +121,10 @@ class Representative(Base):
 
     organization_id = Column(
         UUID(as_uuid=True),
+        ForeignKey(
+            "organizations.organization_id",
+            ondelete="CASCADE"
+        ),
         nullable=False
     )
 
@@ -177,6 +191,10 @@ class Representative(Base):
 
 
 
+# =========================
+# Agent
+# =========================
+
 class Agent(Base):
 
     __tablename__ = "agents"
@@ -191,6 +209,10 @@ class Agent(Base):
 
     organization_id = Column(
         UUID(as_uuid=True),
+        ForeignKey(
+            "organizations.organization_id",
+            ondelete="CASCADE"
+        ),
         nullable=False
     )
 
@@ -217,6 +239,10 @@ class Agent(Base):
 
 
 
+# =========================
+# Lead
+# =========================
+
 class Lead(Base):
 
     __tablename__ = "leads"
@@ -231,6 +257,10 @@ class Lead(Base):
 
     organization_id = Column(
         UUID(as_uuid=True),
+        ForeignKey(
+            "organizations.organization_id",
+            ondelete="CASCADE"
+        ),
         nullable=False
     )
 
