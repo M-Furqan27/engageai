@@ -10,25 +10,18 @@ from database.models import (
     Lead
 )
 
-# Register conversation models
-from conversations.models import (
-    Conversation,
-    ConversationMessage
-)
-
-
 from pipeline.router import router as pipeline_router
-from conversations.router import router as conversation_router
-from widget.router import router as widget_router
+
 from fastapi.middleware.cors import CORSMiddleware
-
-
 
 
 Base.metadata.create_all(bind=engine)
 
 
-app = FastAPI(title="AI Agent Platform")
+app = FastAPI(
+    title="AI Agent Platform"
+)
+
 
 app.add_middleware(
     CORSMiddleware,
@@ -39,12 +32,11 @@ app.add_middleware(
 )
 
 
-app.include_router(pipeline_router)
+# Pipeline setup endpoint
+app.include_router(
+    pipeline_router
+)
 
-
-app.include_router(conversation_router)
-
-app.include_router(widget_router)
 
 @app.get("/")
 def root():
