@@ -12,7 +12,11 @@ from sqlalchemy import (
 
 from sqlalchemy.orm import relationship
 
+from sqlalchemy.dialects.postgresql import UUID
+
 from database.database import Base
+
+import uuid
 
 
 def utc_now():
@@ -26,14 +30,14 @@ class Conversation(Base):
 
 
     id = Column(
-        Integer,
+        UUID(as_uuid=True),
         primary_key=True,
-        autoincrement=True
+        default=uuid.uuid4
     )
 
 
     organization_id = Column(
-        Integer,
+        UUID(as_uuid=True),
         ForeignKey(
             "organizations.id",
             ondelete="CASCADE"
@@ -41,35 +45,38 @@ class Conversation(Base):
         nullable=False
     )
 
+
     agent_id = Column(
-        Integer,
+        UUID(as_uuid=True),
         ForeignKey(
             "agents.id",
             ondelete="CASCADE"
         ),
         nullable=False
     )
-    
+
+
     azure_conversation_id = Column(
         String,
         nullable=True
     )
+
 
     visitor_id = Column(
         String(100),
         nullable=False,
         index=True
     )
-    
+
+
     lead_id = Column(
-        Integer,
+        UUID(as_uuid=True),
         ForeignKey(
             "leads.id",
             ondelete="SET NULL"
         ),
         nullable=True
     )
-
 
 
     status = Column(
@@ -123,14 +130,14 @@ class ConversationMessage(Base):
 
 
     id = Column(
-        Integer,
+        UUID(as_uuid=True),
         primary_key=True,
-        autoincrement=True
+        default=uuid.uuid4
     )
 
 
     conversation_id = Column(
-        Integer,
+        UUID(as_uuid=True),
         ForeignKey(
             "conversations.id",
             ondelete="CASCADE"
