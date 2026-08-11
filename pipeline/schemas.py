@@ -1,4 +1,5 @@
 from pydantic import BaseModel
+from uuid import UUID
 
 
 class RepresentativeInput(BaseModel):
@@ -13,7 +14,7 @@ class RepresentativeInput(BaseModel):
 
 class PipelineSetupRequest(BaseModel):
 
-    organization_id: int
+    organization_id: UUID
 
     organization_name: str
 
