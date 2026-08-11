@@ -44,40 +44,18 @@ class OrganizationService:
 
         for rep in organization.representatives:
 
-
-            services = []
-
-
-            for service in rep.services:
-
-                services.append({
-
-                    "name":
-                    service.name,
-
-
-                    "description":
-                    service.description
-
-                })
-
-
-
             representatives.append({
 
-                "name":
-                rep.name,
+                "name": rep.representative_name,
 
+                "email": rep.company_email,
 
-                "email":
-                rep.email,
-
-
-                "services":
-                services
+                "service": {
+                    "name": rep.service,
+                    "description": rep.service_description
+                }
 
             })
-
 
 
 
