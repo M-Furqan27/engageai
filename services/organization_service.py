@@ -64,10 +64,8 @@ class OrganizationService:
 
             "organization": {
 
-
                 "name":
-                organization.name,
-
+                organization.organization_name,
 
                 "description":
                 organization.description
